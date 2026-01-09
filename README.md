@@ -2,7 +2,7 @@
 
 This repository is all about me having fun experimenting with building a relatively simple physics simulation that computes the exact positions and velocities at each timestamp, where an object follows a curve $(t,f(t))$ given some real-valued function $f$.
 
-The below shows some examples
+The below shows some examples (there is a slight issue with the time-to-animation mapping but nonetheless pretty cool imo):
 
 ![alt text](animation2.gif)
 
