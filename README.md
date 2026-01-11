@@ -1,8 +1,10 @@
 ### Simple physics simulation experiments
 
-This repository is all about me having fun experimenting with building a relatively simple physics simulation that computes the exact positions and velocities at each timestamp, where an object follows a curve $(t,f(t))$ given some real-valued function $f$.
+This repository is all about me having fun experimenting with building a relatively simple physics simulation.
 
-The below shows some examples (there is a slight issue with the time-to-animation mapping but nonetheless pretty cool imo):
+This repository has two implementations: one for simulating an object that follows a two dimensional curve $(t,f(t))$ for some real valued function $f$, being affected by gravity, and one for simulating an object that lies on a surface in 3D given a surface $(x,y,f(x,y))$.
+
+The below shows some examples:
 
 ![alt text](animation2.gif)
 
@@ -10,11 +12,15 @@ The below shows some examples (there is a slight issue with the time-to-animatio
 
 Trajectory and position analysis (example):
 
-![alt text](image1.png)
+![alt text](sinwave_1.png)
+
+![alt text](sinwave_2.png)
 
 #### Derivation equations
 
 Here I will explain where the equations of motions come from which the simulation uses.
+
+##### Curve simulation
 
 We first start with the given parametrisation of a curve in 2D: $y(x)=(x,f(x))$. We then find an arc-length reparametrisation $\gamma(s)=y(S^{-1}(s))$ where
 
@@ -46,14 +52,66 @@ $(0,-g)=K(s(t))v(t)^2N(s(t))+a(t)T(s(t))$
 
 We can now multiply by $T(s(t))$ on both sides (inner product):
 $(0,-g)\cdot T(s(t))=a(t)$
-The left term vanishes (because $T$ and $N$ form an orthonormal basis) and the second becomes just $a(t)$, because $T$ is unitary. We thus become the following system of ODEs:
+The left term vanishes (because $T$ and $N$ form an orthonormal basis) and the second becomes just $a(t)$, because $T$ is unitary. Finally, we add a friction term which will damp the solution, based on the Coulomb + viscous friction (I just looked up some friction models). We thus become the following system of ODEs:
 
-$v'(t)=(0,-g)\cdot T(s(t))$
+$v'(t)=(0,-g)\cdot T(s(t))-g\mu\cdot\text{sign}(v(t))+\alpha |v(t)| v$
 $s'(t)=v(t)$
 
+where $\alpha$ is a small scalar, in my simulation chosen to be 0.1.
 We can solve this for $s$ and $v$ numerically. Thus we have found the solution of the system, yielding the travelled distance $s(t)$ after $t$ seconds and the scalar velocity $v(t)$ after $t$ seconds.
 
 I derived this equation somewhat by myself, with the help of some google-searching and AI-prompting (and reading through my differential geometry course).
 
+##### Surface simulation
 
+This article basically describes the exact thing I'm doing here:
+
+https://www.sciencedirect.com/science/article/pii/S2095034919300200
+
+First we note that the parametrisation for the surface in 3D we use is of the form
+
+$F(x,y)=(x,y,f(x,y))$
+
+Then we compute the normal vector:
+
+$N(F(x,y))=(-\frac{df}{dx},-\frac{df}{dy},1) / ||(-\frac{df}{dx},-\frac{df}{dy},1)||
+
+We will denote this by $n$.
+
+We then define the matrix $P$ as the linear operator which projects onto the tangent plane (perpendicular to $n$):
+
+$P=I-nn^{T}$
+
+This matrix of course depends on the position vector $r$.
+
+We first decompose the acceleration vector $r''$ as:
+
+$r''=g+\lambda n$
+
+such that it has a pure gravitational component and a normal component. We then apply the projection $P$:
+
+$Pr''=Pg+Pn$
+
+but because $Pn=0$ and we want that $r''$ is tangent, we get
+
+$r''=Pg=(I-nn^{T})g=g-(g\cdot n)n$
+
+where $P$ depends on the position $r$ of course.
+
+Another way to see it is: the desired acceleration $r''$ should be the tangent component of gravity.
+
+We can also add friction to this, to make it more realistic:
+
+$r''=Pg+\mu |r'|r'
+
+If we write this out in coordinates, we get the system of ODEs
+
+$x''=-g\cdot f_x/D-\mu |v|x'$
+$y''=-g\cdot f_y/D-\mu |v|y'$
+$z''=-g\cdot g/D-\mu |v|z'$
+
+where
+
+$D=\sqrt{1+f_{x}^2+f_{y}^2}$,
+$v=r'=\sqrt{(x')^2+(y')^2+(z')^2}$
 
