@@ -61,14 +61,13 @@ def system_solve(func, mu=0.001, x0=0.0, dt=0.01, Tmax=30.0, x_to=None):
     
     xvalues = S_inv_interp(result[0, :]) # (n_points)
     yvalues = np.vectorize(func)(xvalues) # (n_points)
-    slopes = np.vectorize(df)(xvalues) # (n_points)
 
     return np.stack([
         result[0, :], # s(t) values
         result[1, :], # v(t) values
         xvalues, # x(t) values
         yvalues, # y(t) values
-        slopes # slope values (from slope of curve)
+        np.vectorize(df)(xvalues) # slope values (from slope of curve)
         ])
 
 def system_solve_3(func, x0, y0, vx0, vy0, vz0,
@@ -119,12 +118,16 @@ def system_solve_3(func, x0, y0, vx0, vy0, vz0,
 
         fx = df_x(x, y)
         fy = df_y(x, y)
+
+        # unit normal vector
         n = np.array([-fx, -fy, 1.0])
         n /= np.linalg.norm(n)
 
+        # project velocity vector onto tangent plane (numerical stability)
         v = np.array([vx, vy, vz])
         v -= np.dot(v, n) * n
 
+        # update state accordingly
         state = np.array([x, y, v[0], v[1], v[2]])
 
         result[:, i] = state

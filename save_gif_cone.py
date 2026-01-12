@@ -6,7 +6,7 @@ from vispy.geometry import MeshData
 from vispy.scene import visuals
 from funcs import system_solve_3
 from vispy.visuals.filters import ShadingFilter
-from vispy.gloo.util import _screenshot  # Better for capture
+from vispy.gloo.util import _screenshot
 
 mu = 0.01
 Tmax = 30

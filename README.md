@@ -4,11 +4,15 @@ This repository is all about me having fun experimenting with building a relativ
 
 This repository has two implementations: one for simulating an object that follows a two dimensional curve $(t,f(t))$ for some real valued function $f$, being affected by gravity, and one for simulating an object that lies on a surface in 3D given a surface $(x,y,f(x,y))$.
 
-The below shows some examples:
+The below shows some examples (some timescaling is off here, but it's still pretty cool):
 
 ![alt text](animation2.gif)
 
 ![alt text](animation.gif)
+
+![alt text](animation3.gif)
+
+![alt text](animation4.gif)
 
 Trajectory and position analysis (example):
 
