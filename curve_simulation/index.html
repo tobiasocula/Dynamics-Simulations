@@ -63,6 +63,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#def-system_solvefunc-mu0001-x000-dt001-tmax300-x_tonone" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -225,6 +230,24 @@
       
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Curve simulation
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -241,6 +264,45 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#def-system_solvefunc-mu0001-x000-dt001-tmax300-x_tonone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        def system_solve(func, mu=0.001, x0=0.0, dt=0.01, Tmax=30.0, x_to=None):
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#def-system_solve_v2func-mu0001-x000-dt001-tmax300" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        def system_solve_v2(func, mu=0.001, x0=0.0, dt=0.01, Tmax=30.0):
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -291,6 +353,36 @@
   
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#def-system_solvefunc-mu0001-x000-dt001-tmax300-x_tonone" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        def system_solve(func, mu=0.001, x0=0.0, dt=0.01, Tmax=30.0, x_to=None):
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#def-system_solve_v2func-mu0001-x000-dt001-tmax300" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        def system_solve_v2(func, mu=0.001, x0=0.0, dt=0.01, Tmax=30.0):
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -308,6 +400,7 @@
 
   <h1>Curve simulation</h1>
 
+<h3 id="def-system_solvefunc-mu0001-x000-dt001-tmax300-x_tonone"><code>def system_solve(func, mu=0.001, x0=0.0, dt=0.01, Tmax=30.0, x_to=None):</code></h3>
 <p>We first start with the given parametrisation of a curve in 2D: <span class="arithmatex">\(y(x)=(x,f(x))\)</span>. We then find an arc-length reparametrisation <span class="arithmatex">\(\gamma(s)=y(S^{-1}(s))\)</span> where</p>
 <p><span class="arithmatex">\(S(s)=\int_{0}^{s}||y'(x)||dx=\int_{0}^{s}\sqrt{1+f'(x)^2}dx\)</span></p>
 <p>We find <span class="arithmatex">\(S^{-1}\)</span> by numerical computation.</p>
@@ -334,6 +427,27 @@ s'(t)=v(t)
 <p>where <span class="arithmatex">\(\alpha\)</span> is a small scalar, in my simulation chosen to be 0.1.
 We can solve this for <span class="arithmatex">\(s\)</span> and <span class="arithmatex">\(v\)</span> numerically. Thus we have found the solution of the system, yielding the travelled distance <span class="arithmatex">\(s(t)\)</span> after <span class="arithmatex">\(t\)</span> seconds and the scalar velocity <span class="arithmatex">\(v(t)\)</span> after <span class="arithmatex">\(t\)</span> seconds.</p>
 <p>I derived this equation somewhat by myself, with the help of some google-searching and AI-prompting (and reading through my differential geometry course).</p>
+<h3 id="def-system_solve_v2func-mu0001-x000-dt001-tmax300"><code>def system_solve_v2(func, mu=0.001, x0=0.0, dt=0.01, Tmax=30.0):</code></h3>
+<p>There is also a second way (potentially easier) way to simulate movement like this (implemented in the above function).</p>
+<p>Here, we simply project the gravity vector <span class="arithmatex">\((0, -g)\)</span> onto the normal vector of the tangent line. The tangent line at point <span class="arithmatex">\((x,f(x))\)</span> has direction vector equal to <span class="arithmatex">\((1,f'(x))\)</span> and normal vector equal to <span class="arithmatex">\(\frac{(-f'(x),1)}{||(-f'(x),1)||}=\frac{(-f'(x),1)}{\sqrt{1+f'(x)^2}}\)</span>. Thus if we project the gravity vector onto the tangent line we get</p>
+<div class="arithmatex">\[\begin{equation}
+\frac{(-f'(x),1)}{\sqrt{1+f'(x)^2}}\langle \frac{(-f'(x),1)}{\sqrt{1+f'(x)^2}},(0,-g)\rangle
+=\frac{-gf'(x)}{1+f'(x)^2}(-f'(x),1)
+\end{equation}\]</div>
+<p>and this has to be the resulting acceleration vector <span class="arithmatex">\(r''\)</span> of the particle. If we also add friction, then we get the final ODE:</p>
+<div class="arithmatex">\[\begin{equation}
+r''=(x'',y'')=\frac{-gf'(x)}{1+f'(x)^2}(-f'(x),1)-\mu|v|v
+\end{equation}\]</div>
+<p>where <span class="arithmatex">\(v=(x',y')\)</span> and <span class="arithmatex">\(|v|=\sqrt{v_{x}^2+v_{y}^2}\)</span>.</p>
+<p>Thus we obtain the system of ODEs</p>
+<div class="arithmatex">\[\begin{equation}
+\begin{aligned}
+x'=v_x\\
+y'=v_y\\
+v_x'=\frac{-gf'(x)^2}{1+f'(x)^2}-\mu|v|v_x\\
+v_y'=\frac{-gf'(x)}{1+f'(x)^2}-\mu|v|v_y
+\end{aligned}
+\end{equation}\]</div>
 
 
 
