@@ -1,3 +1,6 @@
+
+### `def system_solve(func, mu=0.001, x0=0.0, dt=0.01, Tmax=30.0, x_to=None):`
+
 We first start with the given parametrisation of a curve in 2D: $y(x)=(x,f(x))$. We then find an arc-length reparametrisation $\gamma(s)=y(S^{-1}(s))$ where
 
 $S(s)=\int_{0}^{s}||y'(x)||dx=\int_{0}^{s}\sqrt{1+f'(x)^2}dx$
@@ -41,3 +44,33 @@ where $\alpha$ is a small scalar, in my simulation chosen to be 0.1.
 We can solve this for $s$ and $v$ numerically. Thus we have found the solution of the system, yielding the travelled distance $s(t)$ after $t$ seconds and the scalar velocity $v(t)$ after $t$ seconds.
 
 I derived this equation somewhat by myself, with the help of some google-searching and AI-prompting (and reading through my differential geometry course).
+
+### `def system_solve_v2(func, mu=0.001, x0=0.0, dt=0.01, Tmax=30.0):`
+
+There is also a second way (potentially easier) way to simulate movement like this (implemented in the above function).
+
+Here, we simply project the gravity vector $(0, -g)$ onto the normal vector of the tangent line. The tangent line at point $(x,f(x))$ has direction vector equal to $(1,f'(x))$ and normal vector equal to $\frac{(-f'(x),1)}{||(-f'(x),1)||}=\frac{(-f'(x),1)}{\sqrt{1+f'(x)^2}}$. Thus if we project the gravity vector onto the tangent line we get
+
+\begin{equation}
+\frac{(-f'(x),1)}{\sqrt{1+f'(x)^2}}\langle \frac{(-f'(x),1)}{\sqrt{1+f'(x)^2}},(0,-g)\rangle
+=\frac{-gf'(x)}{1+f'(x)^2}(-f'(x),1)
+\end{equation}
+
+and this has to be the resulting acceleration vector $r''$ of the particle. If we also add friction, then we get the final ODE:
+
+\begin{equation}
+r''=(x'',y'')=\frac{-gf'(x)}{1+f'(x)^2}(-f'(x),1)-\mu|v|v
+\end{equation}
+
+where $v=(x',y')$ and $|v|=\sqrt{v_{x}^2+v_{y}^2}$.
+
+Thus we obtain the system of ODEs
+
+\begin{equation}
+\begin{aligned}
+x'=v_x\\
+y'=v_y\\
+v_x'=\frac{-gf'(x)^2}{1+f'(x)^2}-\mu|v|v_x\\
+v_y'=\frac{-gf'(x)}{1+f'(x)^2}-\mu|v|v_y
+\end{aligned}
+\end{equation}

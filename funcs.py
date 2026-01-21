@@ -1,8 +1,5 @@
 
 import numpy as np
-from scipy.integrate import solve_ivp
-import scipy.integrate as integrate
-from scipy.optimize import brentq
 from scipy.integrate import cumulative_trapezoid
 from scipy.interpolate import interp1d
 
@@ -69,6 +66,54 @@ def system_solve(func, mu=0.001, x0=0.0, dt=0.01, Tmax=30.0, x_to=None):
         yvalues, # y(t) values
         np.vectorize(df)(xvalues) # slope values (from slope of curve)
         ])
+
+def system_solve_v2(func, mu=0.001, x0=0.0, dt=0.01, Tmax=30.0):
+
+    def df(x, h=1e-7):
+        return (func(x + h) - func(x - h)) / (2*h)
+
+    def rhs(state):
+        x, vx, vy = state
+
+        dx = df(x)
+        g = 9.81
+        D = (1 + dx * dx)
+
+        v_norm = np.sqrt(vx*vx + vy*vy)
+
+        ax = -g * dx / D - mu * v_norm * vx
+        ay = -g * dx * dx / D - mu * v_norm * vy
+
+        return np.array([vx, ax, ay])
+    
+    state = np.array([x0, 0.0, 0.0])
+
+    n_steps = int(Tmax / dt)
+
+    result = np.empty((3, n_steps))
+
+    for i in range(n_steps):
+
+        # RK4 step
+        k1 = rhs(state)
+        k2 = rhs(state + 0.5*dt*k1)
+        k3 = rhs(state + 0.5*dt*k2)
+        k4 = rhs(state + dt*k3)
+        state = state + dt*(k1 + 2*k2 + 2*k3 + k4)/6
+
+        x, vx, vy = state
+        dx = df(x)
+        n = np.array([-dx, 1])
+        n /= np.linalg.norm(n)
+        v = np.array([vx, vy])
+        v -= np.dot(v, n) * n
+
+        # update state accordingly
+        state = np.array([x, v[0], v[1]])
+
+        result[:, i] = state
+
+    return result
 
 def system_solve_3(func, x0, y0, vx0, vy0, vz0,
                    mu=0.001, Tmax=30, dt=0.1):
